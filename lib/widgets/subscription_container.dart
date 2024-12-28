@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kidflix_app/app/helpers/app_locale.dart';
 import 'package:kidflix_app/app/styles/color.dart';
 import 'package:kidflix_app/domain/models/package_model.dart';
 
@@ -49,7 +50,7 @@ class SubscriptionContainer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      '${package.ageFrom} - ${package.ageTo} Years',
+                      '${package.ageFrom} - ${package.ageTo} ${getLang(context, "years")}',
                       style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 28,
@@ -69,8 +70,8 @@ class SubscriptionContainer extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 2),
-                        const Text(
-                          '\\Monthly',
+                        Text(
+                          '\\${getLang(context, "monthly")}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
@@ -92,8 +93,8 @@ class SubscriptionContainer extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 2),
-                        const Text(
-                          '\\Yearly',
+                        Text(
+                          '\\${getLang(context, "yearly")}',
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,

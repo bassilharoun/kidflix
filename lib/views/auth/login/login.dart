@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:kidflix_app/app/app_cubit/app_cubit.dart';
 import 'package:kidflix_app/app/app_cubit/app_states.dart';
+import 'package:kidflix_app/app/global_functions.dart';
+import 'package:kidflix_app/app/helpers/app_locale.dart';
 import 'package:kidflix_app/app/styles/color.dart';
 import 'package:kidflix_app/app/styles/styles.dart';
 import 'package:kidflix_app/views/auth/register/register.dart';
@@ -21,28 +23,56 @@ class Login extends StatefulWidget {
   State<Login> createState() => _loginState();
 }
 
-class _loginState extends State<Login> {
+class _loginState extends State<Login> with TickerProviderStateMixin {
   final formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _controller.dispose();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     AppCubit cubit = AppCubit.get(context);
 
     return BlocConsumer<AppCubit, AppState>(
       listener: (context, state) {
-        if (state is KidLoginSuccessState) {
+        if (state is KidLoginLoadingState) {
+          showLoadingDialog(context, _controller);
+        } else if (state is KidLoginErrorState) {
+          hideLoadingDialog(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Error"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        } else if (state is KidLoginSuccessState) {
           cubit.getPackages();
           cubit.getCategories().then((value) {
             cubit
-                .fetchVideos("${cubit.categoryResponse!.data.first.id}")
+                .fetchVideos("${cubit.categoryResponse!.data?.first.id}")
                 .then((value) {
-              cubit.fetchProfile().then((value) {
-                Navigator.pushReplacement(
+              cubit.fetchProfile(context).then((value) {
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const Home(),
                   ),
+                  (Route<dynamic> route) => false,
                 );
               });
             });
@@ -86,7 +116,7 @@ class _loginState extends State<Login> {
                           }
                           return null;
                         },
-                        labelText: "Email",
+                        labelText: "${getLang(context, "email")}",
                         hintText: "ex@kidflix.com",
                         prefixIcon: Icon(
                           Icons.email_outlined,
@@ -104,7 +134,7 @@ class _loginState extends State<Login> {
                           }
                           return null;
                         },
-                        labelText: "Password",
+                        labelText: "${getLang(context, "password")}",
                         hintText: "********",
                         prefixIcon: Icon(
                           Icons.lock_outline,
@@ -115,12 +145,12 @@ class _loginState extends State<Login> {
                       ),
                       Gap(15.h),
                       CustomButton(
-                        data: "Login",
+                        data: "${getLang(context, "login")}",
                         onPressed: state is! KidLoginLoadingState
                             ? () {
                                 if (formKey.currentState!.validate()) {
                                   cubit.login(emailController.text,
-                                      passwordController.text);
+                                      passwordController.text, context);
                                 }
                               }
                             : null,
@@ -130,7 +160,7 @@ class _loginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Don't have an account? ",
+                            "${getLang(context, "dontHaveAnAccount")}",
                             style: AppStyles.style14Regular(
                               FontFamily.FIGTREE,
                               color: Colors.black,
@@ -139,7 +169,7 @@ class _loginState extends State<Login> {
                             ),
                           ),
                           CustomTextButton(
-                              text: "Register",
+                              text: "${getLang(context, "register")}",
                               style: AppStyles.style16Medium(
                                 FontFamily.FIGTREE,
                                 color: AppColors.purble,
@@ -156,43 +186,43 @@ class _loginState extends State<Login> {
                               })
                         ],
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 20, bottom: 20),
-                        child: Text(
-                          'or connect with',
-                          style: TextStyle(color: Colors.black, fontSize: 18),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 65),
-                            child: Container(
-                              width: 80,
-                              height: 30,
-                              child: const Image(
-                                image:
-                                    AssetImage('assets/images/google.logo.png'),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 80,
-                            height: 30,
-                            child: const Image(
-                              image:
-                                  AssetImage('assets/images/facebook.logo.png'),
-                            ),
-                          ),
-                          Container(
-                            width: 80,
-                            height: 30,
-                            child: const Image(
-                              image: AssetImage('assets/images/apple.logo.png'),
-                            ),
-                          ),
-                        ],
-                      ),
+                      // const Padding(
+                      //   padding: EdgeInsets.only(top: 20, bottom: 20),
+                      //   child: Text(
+                      //     'or connect with',
+                      //     style: TextStyle(color: Colors.black, fontSize: 18),
+                      //   ),
+                      // ),
+                      // Row(
+                      //   children: [
+                      //     Padding(
+                      //       padding: const EdgeInsets.only(left: 65),
+                      //       child: Container(
+                      //         width: 80,
+                      //         height: 30,
+                      //         child: const Image(
+                      //           image:
+                      //               AssetImage('assets/images/google.logo.png'),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     Container(
+                      //       width: 80,
+                      //       height: 30,
+                      //       child: const Image(
+                      //         image:
+                      //             AssetImage('assets/images/facebook.logo.png'),
+                      //       ),
+                      //     ),
+                      //     Container(
+                      //       width: 80,
+                      //       height: 30,
+                      //       child: const Image(
+                      //         image: AssetImage('assets/images/apple.logo.png'),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   ),
                 ),

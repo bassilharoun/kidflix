@@ -1,5 +1,5 @@
 class ProfileResponse {
-  bool status;
+  bool? status;
   List<UserData>? data;
   String message;
 

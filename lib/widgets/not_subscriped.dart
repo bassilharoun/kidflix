@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidflix_app/app/helpers/app_locale.dart';
 import 'package:kidflix_app/app/styles/color.dart';
 import 'package:kidflix_app/app/styles/styles.dart';
 import 'package:kidflix_app/views/nav_bar/nav_bar.dart';
@@ -14,12 +15,12 @@ class NotSubscriped extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              'You are not subscriped yet',
+              '${getLang(context, "youAreNotSubscribedYet")}',
               style: AppStyles.style18SemiBold(FontFamily.FIGTREE,
                   color: Colors.grey),
             ),
             Text(
-              'Please subscripe to watch videos',
+              '${getLang(context, "pleaseSubscribeToWatchVideos")}',
               style: AppStyles.style18SemiBold(FontFamily.FIGTREE,
                   color: Colors.grey),
             ),

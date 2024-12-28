@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:http/http.dart';
 import 'package:kidflix_app/app/app_cubit/app_cubit.dart';
 import 'package:kidflix_app/app/app_cubit/app_states.dart';
+import 'package:kidflix_app/app/global_functions.dart';
+import 'package:kidflix_app/app/helpers/app_locale.dart';
 import 'package:kidflix_app/app/styles/color.dart';
 import 'package:kidflix_app/app/styles/styles.dart';
 import 'package:kidflix_app/views/auth/login/login.dart';
@@ -21,7 +24,7 @@ class Register extends StatefulWidget {
   State<Register> createState() => _RegisterState();
 }
 
-class _RegisterState extends State<Register> {
+class _RegisterState extends State<Register> with TickerProviderStateMixin {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final TextEditingController emailController = TextEditingController();
@@ -50,6 +53,22 @@ class _RegisterState extends State<Register> {
   Color genderColor = AppColors.blue;
 
   int selectedGender = 0;
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _controller.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,18 +90,29 @@ class _RegisterState extends State<Register> {
         color: Colors.white,
         child: BlocConsumer<AppCubit, AppState>(
           listener: (context, state) {
-            if (state is KidRegisterSuccessState) {
+            if (state is KidRegisterLoadingState) {
+              showLoadingDialog(context, _controller);
+            } else if (state is KidRegisterErrorState) {
+              hideLoadingDialog(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Error"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            } else if (state is KidRegisterSuccessState) {
               cubit.getPackages();
               cubit.getCategories().then((value) {
                 cubit
-                    .fetchVideos("${cubit.categoryResponse!.data.first.id}")
+                    .fetchVideos("${cubit.categoryResponse!.data?.first.id}")
                     .then((value) {
-                  cubit.fetchProfile().then((value) {
-                    Navigator.pushReplacement(
+                  cubit.fetchProfile(context).then((value) {
+                    Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const Home(),
                       ),
+                      (Route<dynamic> route) => false,
                     );
                   });
                 });
@@ -124,7 +154,7 @@ class _RegisterState extends State<Register> {
                           ],
                         ),
                         Gap(20.h),
-                        Text("Secutity",
+                        Text("${getLang(context, "security")}",
                             style: AppStyles.style14Regular(
                               FontFamily.FIGTREE,
                               color: Colors.grey,
@@ -143,7 +173,7 @@ class _RegisterState extends State<Register> {
                             }
                             return null;
                           },
-                          labelText: "Email",
+                          labelText: "${getLang(context, "email")}",
                           hintText: "ex@kidflix.com",
                           prefixIcon: Icon(
                             Icons.email_outlined,
@@ -161,7 +191,7 @@ class _RegisterState extends State<Register> {
                             }
                             return null;
                           },
-                          labelText: "Password",
+                          labelText: "${getLang(context, "password")}",
                           hintText: "********",
                           prefixIcon: Icon(
                             Icons.lock_outline,
@@ -181,7 +211,7 @@ class _RegisterState extends State<Register> {
                             }
                             return null;
                           },
-                          labelText: "Confirm Password",
+                          labelText: "${getLang(context, "confirmPassword")}",
                           hintText: "********",
                           prefixIcon: Icon(
                             Icons.lock_outline,
@@ -191,7 +221,7 @@ class _RegisterState extends State<Register> {
                           canUnObsecure: true,
                         ),
                         Gap(15.h),
-                        Text("Personal Information",
+                        Text("${getLang(context, "personalInfo")}",
                             style: AppStyles.style14Regular(
                               FontFamily.FIGTREE,
                               color: Colors.grey,
@@ -207,8 +237,8 @@ class _RegisterState extends State<Register> {
                             }
                             return null;
                           },
-                          labelText: "Kid Name",
-                          hintText: "Kid Name",
+                          labelText: "${getLang(context, "kidName")}",
+                          hintText: "${getLang(context, "kidName")}",
                           prefixIcon: Icon(
                             Icons.person_outline,
                             color: genderColor,
@@ -219,14 +249,14 @@ class _RegisterState extends State<Register> {
                         DropdownButtonFormField<int>(
                           dropdownColor: Colors.white,
                           value: selectedGender,
-                          items: const [
+                          items: [
                             DropdownMenuItem(
                               value: 0,
-                              child: Text("Male"),
+                              child: Text("${getLang(context, "male")}"),
                             ),
                             DropdownMenuItem(
                               value: 1,
-                              child: Text("Female"),
+                              child: Text("${getLang(context, "female")}"),
                             ),
                           ],
                           onChanged: (value) {
@@ -268,8 +298,8 @@ class _RegisterState extends State<Register> {
                             }
                             return null;
                           },
-                          labelText: "Parent First Name",
-                          hintText: "Parent First Name",
+                          labelText: "${getLang(context, "parentFirstName")}",
+                          hintText: "${getLang(context, "parentFirstName")}",
                           prefixIcon: Icon(
                             Icons.person_outline,
                             color: genderColor,
@@ -284,15 +314,15 @@ class _RegisterState extends State<Register> {
                             }
                             return null;
                           },
-                          labelText: "Parent Last Name",
-                          hintText: "Parent Last Name",
+                          labelText: "${getLang(context, "parentLastName")}",
+                          hintText: "${getLang(context, "parentLastName")}",
                           prefixIcon: Icon(
                             Icons.person_outline,
                             color: genderColor,
                           ),
                         ),
                         Gap(15.h),
-                        Text("More Information",
+                        Text("${getLang(context, "moreInfo")}",
                             style: AppStyles.style14Regular(
                               FontFamily.FIGTREE,
                               color: Colors.grey,
@@ -318,7 +348,7 @@ class _RegisterState extends State<Register> {
                                     true, // optional. Shows phone code before the country name.
                                 onSelect: (Country country) {
                                   debugPrint(
-                                      'Select country: ${country.displayName}');
+                                      '${getLang(context, "selectCountry")}: ${country.displayName}');
                                   setState(() {
                                     selectedCountry = country.displayName;
                                   });
@@ -350,8 +380,8 @@ class _RegisterState extends State<Register> {
                                 }
                                 return null;
                               },
-                              labelText: "Birth Date",
-                              hintText: "Birth Date",
+                              labelText: "${getLang(context, "birthDate")}",
+                              hintText: "${getLang(context, "birthDate")}",
                               prefixIcon: Icon(
                                 Icons.calendar_today_outlined,
                                 color: genderColor,
@@ -363,7 +393,7 @@ class _RegisterState extends State<Register> {
 
                         CustomButton(
                           backGroundColor: genderColor,
-                          data: "Sign Up",
+                          data: "${getLang(context, "signUp")}",
                           onPressed: state is! KidRegisterLoadingState
                               ? () {
                                   if (formKey.currentState!.validate()) {
@@ -382,7 +412,8 @@ class _RegisterState extends State<Register> {
                                         parentLastNameController.text,
                                         selectedCountry,
                                         birthDateController.text,
-                                        selectedGender);
+                                        selectedGender,
+                                        context);
                                     // }
                                   }
                                 }
@@ -393,7 +424,7 @@ class _RegisterState extends State<Register> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "Have an account? ",
+                              "${getLang(context, "haveAnAccount")}",
                               style: AppStyles.style14Regular(
                                 FontFamily.FIGTREE,
                                 color: Colors.black,
@@ -402,7 +433,7 @@ class _RegisterState extends State<Register> {
                               ),
                             ),
                             CustomTextButton(
-                                text: "Login",
+                                text: "${getLang(context, "login")}",
                                 style: AppStyles.style16Medium(
                                   FontFamily.FIGTREE,
                                   color: genderColor,
@@ -417,44 +448,6 @@ class _RegisterState extends State<Register> {
                                     ),
                                   );
                                 })
-                          ],
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 20, bottom: 20),
-                          child: Text(
-                            'or connect with',
-                            style: TextStyle(color: Colors.black, fontSize: 18),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 65),
-                              child: Container(
-                                width: 80,
-                                height: 30,
-                                child: const Image(
-                                  image: AssetImage(
-                                      'assets/images/google.logo.png'),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              width: 80,
-                              height: 30,
-                              child: const Image(
-                                image: AssetImage(
-                                    'assets/images/facebook.logo.png'),
-                              ),
-                            ),
-                            Container(
-                              width: 80,
-                              height: 30,
-                              child: const Image(
-                                image:
-                                    AssetImage('assets/images/apple.logo.png'),
-                              ),
-                            ),
                           ],
                         ),
                       ],

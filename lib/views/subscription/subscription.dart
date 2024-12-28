@@ -4,13 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:kidflix_app/app/app_cubit/app_cubit.dart';
 import 'package:kidflix_app/app/app_cubit/app_states.dart';
+import 'package:kidflix_app/app/global_functions.dart';
+import 'package:kidflix_app/app/helpers/app_locale.dart';
 import 'package:kidflix_app/app/styles/color.dart';
 import 'package:kidflix_app/views/nav_bar/nav_bar.dart';
 import 'package:kidflix_app/widgets/custom_button.dart';
 import 'package:kidflix_app/widgets/subscription_container.dart';
 
-class Subscription extends StatelessWidget {
-  Subscription({super.key});
+class SubscriptionScreen extends StatelessWidget {
+  SubscriptionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +28,19 @@ class Subscription extends StatelessWidget {
           color: Colors.white,
           // decoration: const BoxDecoration(gradient: AppColors.linearGradiant),
           child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_ios,
+                  color: AppColors.mix,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
             resizeToAvoidBottomInset: false,
             backgroundColor: Colors.transparent,
             body: Padding(
@@ -35,8 +50,8 @@ class Subscription extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Gap(15.h),
-                    const Text(
-                      'Subscribtion',
+                    Text(
+                      '${getLang(context, "subscription")}',
                       style: TextStyle(
                         fontSize: 27,
                         fontWeight: FontWeight.w700,
@@ -73,20 +88,24 @@ class Subscription extends StatelessWidget {
                     // Gap(15.h),
                     CustomButton(
                       data: cubit.profileResponse.data!.first.package == null
-                          ? 'Subscribe'
-                          : 'Already Subscribed',
+                          ? '${getLang(context, "subscribe")}'
+                          : '${getLang(context, "alreadySubscribed")}',
                       onPressed: cubit.profileResponse.data!.first.package ==
                               null
-                          ? () {
+                          ? () async {
                               if (cubit.selectedPackage != -1) {
-                                cubit.subscribe(
-                                    cubit.packageResponse!
-                                        .data[cubit.selectedPackage].id,
-                                    cubit
-                                        .packageResponse!
-                                        .data[cubit.selectedPackage]
-                                        .plans[0]
-                                        .id);
+                                await showAddPasswordDialog(context, () async {
+                                  cubit.subscribe(
+                                      cubit.packageResponse!
+                                          .data[cubit.selectedPackage].id,
+                                      cubit
+                                          .packageResponse!
+                                          .data[cubit.selectedPackage]
+                                          .plans[0]
+                                          .id,
+                                      context,
+                                      cubit.accessCode);
+                                });
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

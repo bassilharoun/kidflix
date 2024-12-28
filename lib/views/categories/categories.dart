@@ -1,194 +1,76 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
+import 'package:kidflix_app/app/app_cubit/app_cubit.dart';
 import 'package:kidflix_app/app/styles/color.dart';
+import 'package:kidflix_app/app/styles/styles.dart';
+import 'package:kidflix_app/views/nav_bar/nav_bar.dart';
+import 'package:kidflix_app/widgets/category_item.dart';
 
-class ChooseFavoriteAnimal extends StatelessWidget {
-  const ChooseFavoriteAnimal({super.key});
+class CategoriesScreen extends StatelessWidget {
+  const CategoriesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    AppCubit cubit = AppCubit.get(context);
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color.fromARGB(255, 254, 255, 255),
-            Color.fromARGB(255, 254, 255, 255),
-            Color.fromARGB(255, 91, 162, 255),
-            Color.fromARGB(255, 233, 112, 229),
-          ],
-        ),
+        gradient: AppColors.linearGradiant,
       ),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.purple,
-        ),
-        body: Column(
-          children: [
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 5),
-                child: Image(
-                  image: AssetImage('assets/images/logo 1.png'),
+        body: Padding(
+          padding: EdgeInsets.all(16.sp),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 0),
+                child: Text(
+                  'Categories',
+                  style: AppStyles.style18SemiBold(
+                    FontFamily.FIGTREE,
+                    color: AppColors.purble,
+                  ),
                 ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(top: 0),
-              child: Text(
-                'Choose Favorite Animal',
-                style: TextStyle(
-                  fontSize: 27,
-                  fontWeight: FontWeight.w900,
-                  color: Color.fromARGB(255, 4, 0, 211),
+              Gap(20.h),
+              Expanded(
+                // Wrap the GridView.builder inside Expanded
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount:
+                        2, // You can adjust the number of items per row
+                    crossAxisSpacing:
+                        10.w, // Adjust the spacing between items horizontally
+                    childAspectRatio:
+                        1.2, // Adjust the aspect ratio of the items
+                  ),
+                  itemCount: cubit.categoryResponse!.data!.length,
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: () {
+                        cubit
+                            .fetchVideos(
+                                "${cubit.categoryResponse!.data![index].id}")
+                            .then((value) {
+                          tabControllerHomeShared.index = 0;
+                        });
+                      },
+                      child: CategoryItem(
+                        categoryName: cubit.categoryResponse!.data![index].name,
+                        categoryImage:
+                            cubit.categoryResponse!.data![index].image,
+                        categoryColor: AppColors.purble.withOpacity(0.5),
+                        height: 100,
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                children: [
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: Container(
-                          height: 170,
-                          width: 170,
-                          decoration: BoxDecoration(
-                            border:
-                                Border.all(width: 2, color: AppColors.purble),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                            image: const DecorationImage(
-                              fit: BoxFit.fill,
-                              image: AssetImage('assets/images/cats.png'),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 12),
-                        child: Text(
-                          'Cats',
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w900,
-                            color: Color.fromARGB(255, 4, 0, 211),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 18),
-                        child: Container(
-                          height: 170,
-                          width: 170,
-                          decoration: BoxDecoration(
-                            border:
-                                Border.all(width: 2, color: AppColors.purble),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                            image: const DecorationImage(
-                              fit: BoxFit.fill,
-                              image: AssetImage('assets/images/falcon.png'),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 12),
-                        child: Text(
-                          'Falcon',
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w900,
-                            color: Color.fromARGB(255, 4, 0, 211),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                children: [
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20),
-                        child: Container(
-                          height: 170,
-                          width: 170,
-                          decoration: BoxDecoration(
-                            border:
-                                Border.all(width: 2, color: AppColors.purble),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                            image: const DecorationImage(
-                              fit: BoxFit.fill,
-                              image: AssetImage('assets/images/tiger.png'),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 12),
-                        child: Text(
-                          'Tiger',
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w900,
-                            color: Color.fromARGB(255, 4, 0, 211),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 18),
-                        child: Container(
-                          height: 170,
-                          width: 170,
-                          decoration: BoxDecoration(
-                            border:
-                                Border.all(width: 2, color: AppColors.purble),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12)),
-                            image: const DecorationImage(
-                              fit: BoxFit.fill,
-                              image: AssetImage('assets/images/dog.png'),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 12),
-                        child: Text(
-                          'Dog',
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w900,
-                            color: Color.fromARGB(255, 4, 0, 211),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

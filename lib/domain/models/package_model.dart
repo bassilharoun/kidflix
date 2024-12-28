@@ -85,7 +85,7 @@ class Package {
 
 // Function to parse entire response
 class PackageResponse {
-  bool status;
+  bool? status;
   List<Package> data;
 
   PackageResponse({

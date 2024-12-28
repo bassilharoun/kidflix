@@ -1,287 +1,155 @@
+import 'package:babstrap_settings_screen/babstrap_settings_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kidflix_app/app/app_cubit/app_cubit.dart';
 import 'package:kidflix_app/app/app_cubit/app_states.dart';
+import 'package:kidflix_app/app/global_functions.dart';
+import 'package:kidflix_app/app/helpers/app_locale.dart';
 import 'package:kidflix_app/app/styles/color.dart';
+import 'package:kidflix_app/app/styles/styles.dart';
+import 'package:kidflix_app/views/editProfile/edit_profile.dart';
+import 'package:kidflix_app/views/onboarding/onboarding_screen.dart';
+import 'package:kidflix_app/views/profile/profile_screen.dart';
+import 'package:kidflix_app/views/settings/terms_screen.dart';
+import 'package:kidflix_app/views/subscription/subscription.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatelessWidget {
-  SettingsScreen({super.key});
-
-  TextEditingController kidNameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController parentFirstNameController = TextEditingController();
-  TextEditingController parentLastNameController = TextEditingController();
-  TextEditingController countryController = TextEditingController();
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     AppCubit cubit = AppCubit.get(context);
-    kidNameController.text = cubit.profileResponse.data!.first.kidName;
-    emailController.text = cubit.profileResponse.data!.first.email;
-    parentFirstNameController.text =
-        cubit.profileResponse.data!.first.pFirstName;
-    parentLastNameController.text = cubit.profileResponse.data!.first.pLastName;
-    countryController.text = cubit.profileResponse.data!.first.country;
+    final imgPath = cubit.profileResponse.data![0].userProfile?.image;
+    final userName = cubit.profileResponse.data![0].kidName;
+
     return BlocConsumer<AppCubit, AppState>(
-      listener: (context, state) {
-        if (state is KidEditProfileSuccessState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Profile Updated Successfully"),
-            ),
-          );
-        }
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: Colors.white,
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
+          // appBar: AppBar(
+          //   title: Text(
+          //     "Settings",
+          //     style: TextStyle(color: Colors.black),
+          //   ),
+          //   backgroundColor: Colors.white,
+          //   elevation: 0,
+          // ),
+          backgroundColor: Colors.grey[200],
+          body: Padding(
+            padding: const EdgeInsets.all(10),
+            child: ListView(
               children: [
-                ProfilePic(
-                  image: cubit.profileResponse.data!.first.userProfile!.image,
-                  imageUploadBtnPress: () {},
-                ),
-                const Divider(),
-                Form(
-                  child: Column(
-                    children: [
-                      UserInfoEditField(
-                        text: "Name",
-                        child: TextFormField(
-                          controller: kidNameController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.purble.withOpacity(0.05),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0 * 1.5, vertical: 16.0),
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(50)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      UserInfoEditField(
-                        text: "Email",
-                        child: TextFormField(
-                          controller: emailController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.purble.withOpacity(0.05),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0 * 1.5, vertical: 16.0),
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(50)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      UserInfoEditField(
-                        text: "parent first name",
-                        child: TextFormField(
-                          controller: parentFirstNameController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.purble.withOpacity(0.05),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0 * 1.5, vertical: 16.0),
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(50)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      UserInfoEditField(
-                        text: "parent last name",
-                        child: TextFormField(
-                          controller: parentLastNameController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.purble.withOpacity(0.05),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0 * 1.5, vertical: 16.0),
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(50)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      UserInfoEditField(
-                        text: "Address",
-                        child: TextFormField(
-                          controller: countryController,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.purble.withOpacity(0.05),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16.0 * 1.5, vertical: 16.0),
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide.none,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(50)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // UserInfoEditField(
-                      //   text: "Old Password",
-                      //   child: TextFormField(
-                      //     obscureText: true,
-                      //     initialValue: "demopass",
-                      //     decoration: InputDecoration(
-                      //       suffixIcon: const Icon(
-                      //         Icons.visibility_off,
-                      //         size: 20,
-                      //       ),
-                      //       filled: true,
-                      //       fillColor: const AppColors.purble.withOpacity(0.05),
-                      //       contentPadding: const EdgeInsets.symmetric(
-                      //           horizontal: 16.0 * 1.5, vertical: 16.0),
-                      //       border: const OutlineInputBorder(
-                      //         borderSide: BorderSide.none,
-                      //         borderRadius: BorderRadius.all(Radius.circular(50)),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      // UserInfoEditField(
-                      //   text: "New Password",
-                      //   child: TextFormField(
-                      //     decoration: InputDecoration(
-                      //       hintText: "New Password",
-                      //       filled: true,
-                      //       fillColor: const AppColors.purble.withOpacity(0.05),
-                      //       contentPadding: const EdgeInsets.symmetric(
-                      //           horizontal: 16.0 * 1.5, vertical: 16.0),
-                      //       border: const OutlineInputBorder(
-                      //         borderSide: BorderSide.none,
-                      //         borderRadius: BorderRadius.all(Radius.circular(50)),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: SizedBox(
-                    width: 140.w,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.purble,
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 48),
-                        shape: const StadiumBorder(),
-                      ),
-                      onPressed: () {
-                        cubit.editProfile(
-                          kidNameController.text,
-                          emailController.text,
-                          parentFirstNameController.text,
-                          parentLastNameController.text,
-                          countryController.text,
-                        );
-                      },
-                      child: const Text("Save Update"),
+                // User card with profile picture and edit option
+                BigUserCard(
+                  backgroundColor: AppColors.purble,
+                  userName: userName,
+                  userProfilePic: NetworkImage(imgPath ?? ""),
+                  cardActionWidget: SettingsItem(
+                    icons: Icons.edit,
+                    iconStyle: IconStyle(
+                      withBackground: true,
+                      borderRadius: 50,
+                      backgroundColor: Colors.yellow[600],
+                    ),
+                    title: "Modify",
+                    subtitle: "Tap to change your data",
+                    subtitleStyle: AppStyles.style12Regular(FontFamily.FIGTREE),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EditProfileScreen()),
                     ),
                   ),
+                ),
+                // Settings group for main options
+                SettingsGroup(
+                  backgroundColor: Colors.white,
+                  items: [
+                    SettingsItem(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AnimatedProfile(
+                                  isTaped: true,
+                                )),
+                      ),
+                      icons: CupertinoIcons.person,
+                      iconStyle:
+                          IconStyle(backgroundColor: ColorStatus.successDark),
+                      title: "${getLang(context, "settings")}",
+                    ),
+                    SettingsItem(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SubscriptionScreen()),
+                        );
+                      },
+                      icons: CupertinoIcons.money_pound,
+                      iconStyle:
+                          IconStyle(backgroundColor: ColorStatus.errorDark),
+                      title: "${getLang(context, "subscription")}",
+                    ),
+                  ],
+                ),
+                SettingsGroup(
+                  backgroundColor: ColorNeutrals.white,
+                  settingsGroupTitle: "Support",
+                  items: [
+                    SettingsItem(
+                      onTap: () async {
+                        var whatsappUrl = "whatsapp://send?phone=+201017751629";
+                        await canLaunch(whatsappUrl)
+                            ? launch(whatsappUrl)
+                            : showToast(
+                                text: "تعذر الوصول لتطبيق واتساب",
+                                state: ToastStates.ERROR,
+                              );
+                      },
+                      icons: Icons.support_agent,
+                      iconStyle: IconStyle(),
+                      title: "${getLang(context, "contactUs")}",
+                    ),
+                    SettingsItem(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => TermsScreen()),
+                      ),
+                      icons: Icons.checklist_outlined,
+                      iconStyle: IconStyle(),
+                      title: "${getLang(context, "privacy")}",
+                    ),
+                  ],
+                ),
+                // Account settings group with logout option
+                SettingsGroup(
+                  backgroundColor: ColorNeutrals.white,
+                  settingsGroupTitle: "Account",
+                  items: [
+                    SettingsItem(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OnboardingScreen(),
+                          ),
+                        );
+                      },
+                      icons: Icons.exit_to_app_rounded,
+                      title: "${getLang(context, "signOut")}",
+                      titleStyle: TextStyle(color: Colors.red),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
         );
       },
-    );
-  }
-}
-
-class ProfilePic extends StatelessWidget {
-  const ProfilePic({
-    super.key,
-    required this.image,
-    this.isShowPhotoUpload = false,
-    this.imageUploadBtnPress,
-  });
-
-  final String image;
-  final bool isShowPhotoUpload;
-  final VoidCallback? imageUploadBtnPress;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      margin: const EdgeInsets.symmetric(vertical: 16.0),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color:
-              Theme.of(context).textTheme.bodyLarge!.color!.withOpacity(0.08),
-        ),
-      ),
-      child: Stack(
-        alignment: Alignment.bottomRight,
-        children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundImage: NetworkImage(image),
-          ),
-          InkWell(
-            onTap: imageUploadBtnPress,
-            child: CircleAvatar(
-              radius: 13,
-              backgroundColor: Theme.of(context).primaryColor,
-              child: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 20,
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class UserInfoEditField extends StatelessWidget {
-  const UserInfoEditField({
-    super.key,
-    required this.text,
-    required this.child,
-  });
-
-  final String text;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0 / 2),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(text),
-          ),
-          Expanded(
-            flex: 3,
-            child: child,
-          ),
-        ],
-      ),
     );
   }
 }

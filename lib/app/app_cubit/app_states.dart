@@ -55,3 +55,7 @@ final class KidEditProfileLoadingState extends AppState {}
 final class KidEditProfileSuccessState extends AppState {}
 
 final class KidEditProfileErrorState extends AppState {}
+
+final class KidCheckPasswordSuccessState extends AppState {}
+
+final class KidProfileSuccessState extends AppState {}

@@ -1,6 +1,6 @@
 class CategoryResponse {
-  bool status;
-  List<Category> data;
+  bool? status;
+  List<Category>? data;
 
   CategoryResponse({
     required this.status,
@@ -10,15 +10,20 @@ class CategoryResponse {
   factory CategoryResponse.fromJson(Map<String, dynamic> json) {
     return CategoryResponse(
       status: json['status'],
-      data: List<Category>.from(
-          json['data'].map((item) => Category.fromJson(item))),
+      data: json['data'] != null 
+          ? List<Category>.from(
+              (json['data'] as List).map((item) => Category.fromJson(item))
+            )
+          : null, // Handle null case for data
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'status': status,
-      'data': List<dynamic>.from(data.map((item) => item.toJson())),
+      'data': data != null
+          ? List<dynamic>.from(data!.map((item) => item.toJson()))
+          : null, // Ensure to handle null data case in toJson as well
     };
   }
 }
@@ -38,7 +43,7 @@ class Category {
     return Category(
       id: json['id'],
       name: json['name'],
-      image: json['image'],
+      image: json['image'] ?? '', // Handle null image with a default value
     );
   }
 

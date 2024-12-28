@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidflix_app/app/helpers/app_locale.dart';
 import 'package:kidflix_app/views/auth/login/login.dart';
 import 'package:kidflix_app/views/auth/register/register.dart';
 import 'package:kidflix_app/widgets/kidflix_app_bar.dart';
@@ -34,15 +35,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   String title = "kidflix";
-  List<String> descriptions = [
-    "Real Moments, Real Impact. License Stunning Stock Videos. Need quality video clips every",
-    "Watch videos and full episodes of all your favourite  shows on kidflix",
-    "Share your videos with friends, family, and the world."
-  ];
 
   @override
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size; // Get screen size
+    List<String> descriptions = [
+      "${getLang(context, "on1")}",
+      "${getLang(context, "on2")}",
+      "${getLang(context, "on3")}",
+    ];
 
     return Scaffold(
       body: Stack(
@@ -123,8 +124,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 curve: Curves.easeInOut,
                               );
                             },
-                            child: const Text(
-                              'Next',
+                            child: Text(
+                              "${getLang(context, "next")}",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
@@ -137,8 +138,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   MaterialPageRoute(
                                       builder: (context) => Register()));
                             },
-                            child: const Text(
-                              'Get Started',
+                            child: Text(
+                              "${getLang(context, "getStarted")}",
                               style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
