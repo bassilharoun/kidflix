@@ -48,10 +48,11 @@ class HomeState extends State<Home>
   void initState() {
     super.initState();
     initializeTabs();
-    _checkUserAccess();
+              _checkUserAccess();
+
   }
 
-  void initializeTabs() {
+  Future<void> initializeTabs() async {
     tabControllerHomeShared = TabController(vsync: this, length: 3);
     tabControllerHomeShared.addListener(_handleTabSelection);
     selectedTabEnum = MyWidgetTabs.HOME;
@@ -80,7 +81,7 @@ class HomeState extends State<Home>
     }
 
     bottomNavigationBar = BottomAppBar(
-        height: 60.h,
+        height: 65.h,
         color: Colors.white,
         child: TabBar(
             controller: tabControllerHomeShared,
@@ -88,6 +89,7 @@ class HomeState extends State<Home>
             dividerColor: Colors.transparent,
             labelColor: AppColors.purble,
             unselectedLabelColor: Colors.black,
+            labelStyle: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold),
             tabs: <Tab>[
               Tab(
                   icon: Icon(CupertinoIcons.home,
@@ -102,11 +104,12 @@ class HomeState extends State<Home>
                           : Theme.of(context).hintColor),
                   text: "${getLang(context, "settings")}"),
               Tab(
-                  icon: Icon(CupertinoIcons.rectangle_3_offgrid,
-                      color: tabControllerHomeShared.index == 2
-                          ? AppColors.purble
-                          : Theme.of(context).hintColor),
-                  text: "${getLang(context, "categories")}"),
+                icon: Icon(CupertinoIcons.rectangle_3_offgrid,
+                    color: tabControllerHomeShared.index == 2
+                        ? AppColors.purble
+                        : Theme.of(context).hintColor),
+                text: "${getLang(context, "categories")}",
+              ),
             ]));
     return bottomNavigationBar;
   }
@@ -141,27 +144,26 @@ class HomeState extends State<Home>
                                     isTaped: true,
                                   )));
                     },
-                    // child: Hero(
-
-                    //   tag: "profile",
-                    //   child: CircleAvatar(
-                    //     child: CachedNetworkImage(
-                    //         imageUrl: AppCubit.get(context)
-                    //                 .profileResponse
-                    //                 .data
-                    //                 ?.first
-                    //                 .userProfile
-                    //                 ?.image ??
-                    //             "",
-                    //         errorWidget: (context, url, error) => Icon(
-                    //             Icons.image_not_supported,
-                    //             color: AppColors.purble.withAlpha(100),
-                    //             size: 30.sp),
-                    //         placeholder: (context, url) => const Center(
-                    //               child: CircularProgressIndicator(),
-                    //             )),
-                    //   ),
-                    // ),
+                    child: Hero(
+                      tag: "profile",
+                      child: CircleAvatar(
+                        child: CachedNetworkImage(
+                            imageUrl: AppCubit.get(context)
+                                    .profileResponse
+                                    .data
+                                    ?.first
+                                    .userProfile
+                                    ?.image ??
+                                "",
+                            errorWidget: (context, url, error) => Icon(
+                                Icons.image_not_supported,
+                                color: AppColors.purble.withAlpha(100),
+                                size: 30.sp),
+                            placeholder: (context, url) => const Center(
+                                  child: CircularProgressIndicator(),
+                                )),
+                      ),
+                    ),
                   ),
                 ),
               ],

@@ -6,6 +6,7 @@ import 'package:kidflix_app/app/styles/color.dart';
 import 'package:kidflix_app/app/styles/styles.dart';
 import 'package:kidflix_app/views/nav_bar/nav_bar.dart';
 import 'package:kidflix_app/widgets/category_item.dart';
+import 'package:kidflix_app/widgets/not_subscriped.dart';
 
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
@@ -38,36 +39,46 @@ class CategoriesScreen extends StatelessWidget {
               Gap(20.h),
               Expanded(
                 // Wrap the GridView.builder inside Expanded
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount:
-                        2, // You can adjust the number of items per row
-                    crossAxisSpacing:
-                        10.w, // Adjust the spacing between items horizontally
-                    childAspectRatio:
-                        1.2, // Adjust the aspect ratio of the items
-                  ),
-                  itemCount: cubit.categoryResponse!.data!.length,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        cubit
-                            .fetchVideos(
-                                "${cubit.categoryResponse!.data![index].id}")
-                            .then((value) {
-                          tabControllerHomeShared.index = 0;
-                        });
-                      },
-                      child: CategoryItem(
-                        categoryName: cubit.categoryResponse!.data![index].name,
-                        categoryImage:
-                            cubit.categoryResponse!.data![index].image,
-                        categoryColor: AppColors.purble.withOpacity(0.5),
-                        height: 100,
+                child: cubit.categoryResponse?.data == null
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            NotSubscriped(),
+                          ],
+                        ),
+                      )
+                    : GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount:
+                              2, // You can adjust the number of items per row
+                          crossAxisSpacing: 10
+                              .w, // Adjust the spacing between items horizontally
+                          childAspectRatio:
+                              1.2, // Adjust the aspect ratio of the items
+                        ),
+                        itemCount: cubit.categoryResponse!.data!.length,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              cubit
+                                  .fetchVideos(
+                                      "${cubit.categoryResponse!.data![index].id}")
+                                  .then((value) {
+                                tabControllerHomeShared.index = 0;
+                              });
+                            },
+                            child: CategoryItem(
+                              categoryName:
+                                  cubit.categoryResponse!.data![index].name,
+                              categoryImage:
+                                  cubit.categoryResponse!.data![index].image,
+                              categoryColor: AppColors.purble.withOpacity(0.5),
+                              height: 100,
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ],
           ),

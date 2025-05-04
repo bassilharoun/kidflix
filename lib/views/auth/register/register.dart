@@ -186,8 +186,8 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin {
                           validator: (p0) {
                             if (p0!.isEmpty) {
                               return "Password is required";
-                            } else if (p0.length < 6) {
-                              return "password must be at least 6 characters";
+                            } else if (p0.length < 8) {
+                              return "password must be at least 8 characters";
                             }
                             return null;
                           },

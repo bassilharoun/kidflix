@@ -8,6 +8,7 @@ import 'package:kidflix_app/app/app_cubit/app_states.dart';
 import 'package:kidflix_app/app/app_cubit/time_check_cubit.dart';
 import 'package:kidflix_app/app/global_functions.dart';
 import 'package:kidflix_app/app/helpers/app_locale.dart';
+import 'package:kidflix_app/app/helpers/cache_helper.dart';
 import 'package:kidflix_app/app/styles/color.dart';
 import 'package:kidflix_app/domain/models/category_model.dart';
 import 'package:kidflix_app/domain/models/package_model.dart';
@@ -61,9 +62,11 @@ class AppCubit extends Cubit<AppState> {
         // add the barear access token to the header
         headers = {
           'Accept': 'application/json',
-          'Authorization': 'Bearer ${response.data['access_token']}',
+        'Authorization': 'Bearer ${response.data['access_token']}',
           'Accept-Language': '${getCurrentLang(context)}',
         };
+        await cacheUserToken(response.data['access_token']);
+
         emit(KidLoginSuccessState());
       } else {
         print(response.statusMessage);
@@ -86,47 +89,52 @@ class AppCubit extends Cubit<AppState> {
       int gender,
       context) async {
     emit(KidRegisterLoadingState());
-    try {
-      var data = FormData.fromMap(
-        {
-          'email': email,
-          'password': password,
-          'kid_name': kidName,
-          'p_first_name': parentFirstName,
-          'p_last_name': parentLastName,
-          'country': country,
-          'birthdate': birthDate,
-          'gender': gender
-        },
-      );
-      debugPrint("data to register is ${data}");
+    // try {
+    var data = FormData.fromMap(
+      {
+        'email': email,
+        'password': password,
+        'kid_name': kidName,
+        'p_first_name': parentFirstName,
+        'p_last_name': parentLastName,
+        'country': country,
+        'birthdate': birthDate,
+        'gender': gender
+      },
+    );
+    debugPrint("data to register is ${data}");
 
-      var response = await dio.request(
-        'https://kidflix.app/api/register',
-        options: Options(
-          method: 'POST',
-          headers: headers,
-        ),
-        data: data,
-      );
+    var response = await dio.request(
+      'https://kidflix.app/api/register',
+      options: Options(
+        method: 'POST',
+        headers: headers,
+      ),
+      data: data,
+    );
 
-      if (response.statusCode == 200) {
-        print(json.encode(response.data));
-        headers = {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer ${response.data['access_token']}',
-          'Accept-Language': '${getCurrentLang(context)}',
-        };
-        await checkPassword(password, context);
-        manageProfile(accessCode).then((value) {});
-      } else {
-        print(response.statusMessage);
-        emit(KidRegisterErrorState());
-      }
-    } catch (err) {
+    if (response.statusCode == 200) {
+      print(json.encode(response.data));
+      headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ${response.data['access_token']}',
+        'Accept-Language': '${getCurrentLang(context)}',
+      };
+      await checkPassword(password, context);
+      manageProfile(accessCode).then((value) {});
+      await cacheUserToken(response.data['access_token']);
+    } else {
+      print("status message ${response.statusMessage}");
       emit(KidRegisterErrorState());
-      debugPrint(err.toString());
     }
+    // } catch (err) {
+    //   emit(KidRegisterErrorState());
+    //   debugPrint(err.toString());
+    // }
+  }
+
+  Future<void> cacheUserToken(String token) async {
+    await CacheHelper.saveData(key: 'user_token', value: token);
   }
 
   Future<void> manageProfile(String passwordConfirm) async {
@@ -275,13 +283,15 @@ class AppCubit extends Cubit<AppState> {
     emit(KidChangeSelectedPackage());
   }
 
-  subscribe(int packageId, int planId, context, String passwordConfirm) async {
+  subscribe(int packageId, int planId, context, String passwordConfirm,
+      String transactionId) async {
     emit(KidSubscribeLoadingState());
     try {
       var data = FormData.fromMap({
         'package_id': '$packageId',
         'plan_id': '$planId',
         'password_code_confirm': passwordConfirm,
+        'transaction_id': transactionId
       });
 
       var response = await dio.request(
@@ -334,10 +344,14 @@ class AppCubit extends Cubit<AppState> {
     }
   }
 
-  Future<void> editProfile(String kidName, String email, String parentFirstName,
-      String parentLastName, String country,
+  Future<void> editProfile(
+      String kidName,
+      String email,
+      String parentFirstName,
+      String parentLastName,
+      String country,
       String passwordConfirm,
-       context) async {
+      context) async {
     emit(KidEditProfileLoadingState());
     try {
       var response = await dio.post(

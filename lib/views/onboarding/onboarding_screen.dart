@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:kidflix_app/app/app_cubit/app_cubit.dart';
 import 'package:kidflix_app/app/helpers/app_locale.dart';
+import 'package:kidflix_app/app/helpers/cache_helper.dart';
 import 'package:kidflix_app/views/auth/login/login.dart';
 import 'package:kidflix_app/views/auth/register/register.dart';
+import 'package:kidflix_app/views/nav_bar/nav_bar.dart';
 import 'package:kidflix_app/widgets/kidflix_app_bar.dart';
 import 'package:video_player/video_player.dart'; // Import the video player package
 
@@ -26,6 +29,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             _videoController.setVolume(0.0);
             _videoController.setLooping(true);
           });
+
+    AppCubit cubit = AppCubit.get(context);
+    String? userToken = CacheHelper.getData(key: "user_token");
+
+    if (userToken != null) {
+      cubit.headers = {
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $userToken',
+        'Accept-Language': 'en',
+      };
+      cubit.getPackages();
+      cubit.getCategories().then((value) {
+        cubit
+            .fetchVideos("${cubit.categoryResponse!.data?.first.id}")
+            .then((value) {
+          cubit.fetchProfile(context).then((value) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const Home(),
+              ),
+              (Route<dynamic> route) => false,
+            );
+          });
+        });
+      });
+    }
   }
 
   @override
@@ -93,10 +123,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           // ),
                           KidflixLogo(),
                           SizedBox(height: 20),
-                          Text(
-                            descriptions[index],
-                            textAlign: TextAlign.start,
-                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          Expanded(
+                            child: Text(
+                              descriptions[index],
+                              textAlign: TextAlign.start,
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            ),
                           ),
                         ],
                       ),

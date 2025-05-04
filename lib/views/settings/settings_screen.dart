@@ -1,18 +1,20 @@
-import 'package:babstrap_settings_screen/babstrap_settings_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kidflix_app/app/app_cubit/app_cubit.dart';
 import 'package:kidflix_app/app/app_cubit/app_states.dart';
 import 'package:kidflix_app/app/global_functions.dart';
 import 'package:kidflix_app/app/helpers/app_locale.dart';
+import 'package:kidflix_app/app/helpers/cache_helper.dart';
 import 'package:kidflix_app/app/styles/color.dart';
 import 'package:kidflix_app/app/styles/styles.dart';
 import 'package:kidflix_app/views/editProfile/edit_profile.dart';
 import 'package:kidflix_app/views/onboarding/onboarding_screen.dart';
 import 'package:kidflix_app/views/profile/profile_screen.dart';
 import 'package:kidflix_app/views/settings/terms_screen.dart';
+import 'package:kidflix_app/views/settings/widgets/settings_group.dart';
+import 'package:kidflix_app/views/settings/widgets/settings_item.dart';
+import 'package:kidflix_app/views/settings/widgets/user_card.dart';
 import 'package:kidflix_app/views/subscription/subscription.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -43,20 +45,15 @@ class SettingsScreen extends StatelessWidget {
             child: ListView(
               children: [
                 // User card with profile picture and edit option
-                BigUserCard(
-                  backgroundColor: AppColors.purble,
+                UserCard(
                   userName: userName,
-                  userProfilePic: NetworkImage(imgPath ?? ""),
+                  userProfilePic: imgPath ?? "",
                   cardActionWidget: SettingsItem(
                     icons: Icons.edit,
-                    iconStyle: IconStyle(
-                      withBackground: true,
-                      borderRadius: 50,
-                      backgroundColor: Colors.yellow[600],
-                    ),
+                    iconColor: Colors.yellow,
+                    
                     title: "Modify",
                     subtitle: "Tap to change your data",
-                    subtitleStyle: AppStyles.style12Regular(FontFamily.FIGTREE),
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -67,6 +64,7 @@ class SettingsScreen extends StatelessWidget {
                 // Settings group for main options
                 SettingsGroup(
                   backgroundColor: Colors.white,
+                  settingsGroupTitle: "Main",
                   items: [
                     SettingsItem(
                       onTap: () => Navigator.push(
@@ -77,9 +75,9 @@ class SettingsScreen extends StatelessWidget {
                                 )),
                       ),
                       icons: CupertinoIcons.person,
-                      iconStyle:
-                          IconStyle(backgroundColor: ColorStatus.successDark),
+                      iconColor: Colors.blue,
                       title: "${getLang(context, "settings")}",
+                      subtitle: "Manage your account",
                     ),
                     SettingsItem(
                       onTap: () {
@@ -90,9 +88,9 @@ class SettingsScreen extends StatelessWidget {
                         );
                       },
                       icons: CupertinoIcons.money_pound,
-                      iconStyle:
-                          IconStyle(backgroundColor: ColorStatus.errorDark),
+                      iconColor: Colors.green,
                       title: "${getLang(context, "subscription")}",
+                      subtitle: "Upgrade your plan",
                     ),
                   ],
                 ),
@@ -111,8 +109,9 @@ class SettingsScreen extends StatelessWidget {
                               );
                       },
                       icons: Icons.support_agent,
-                      iconStyle: IconStyle(),
+                      iconColor: Colors.green,
                       title: "${getLang(context, "contactUs")}",
+                      subtitle: "Chat with us",
                     ),
                     SettingsItem(
                       onTap: () => Navigator.push(
@@ -120,8 +119,9 @@ class SettingsScreen extends StatelessWidget {
                         MaterialPageRoute(builder: (context) => TermsScreen()),
                       ),
                       icons: Icons.checklist_outlined,
-                      iconStyle: IconStyle(),
+                      iconColor: Colors.blue,
                       title: "${getLang(context, "privacy")}",
+                      subtitle: "Terms and conditions",
                     ),
                   ],
                 ),
@@ -138,14 +138,17 @@ class SettingsScreen extends StatelessWidget {
                             builder: (context) => OnboardingScreen(),
                           ),
                         );
+                        CacheHelper.removeData(key: "user_token");
                       },
                       icons: Icons.exit_to_app_rounded,
+                      iconColor: Colors.red,
                       title: "${getLang(context, "signOut")}",
-                      titleStyle: TextStyle(color: Colors.red),
+                      subtitle: "Logout from your account",
                     ),
                   ],
                 ),
               ],
+              // children: [],
             ),
           ),
         );

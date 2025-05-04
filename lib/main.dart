@@ -6,14 +6,19 @@ import 'package:kidflix_app/app/app_cubit/app_cubit.dart';
 import 'package:kidflix_app/app/app_cubit/lang_cubit.dart';
 import 'package:kidflix_app/app/app_cubit/time_check_cubit.dart';
 import 'package:kidflix_app/app/helpers/app_locale.dart';
+import 'package:kidflix_app/app/helpers/cache_helper.dart';
+import 'package:kidflix_app/views/nav_bar/nav_bar.dart';
 import 'package:kidflix_app/views/onboarding/onboarding_screen.dart';
 
-void main() {
-  runApp(const KidFlixApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await CacheHelper.init();
+
+  runApp(KidFlixApp());
 }
 
 class KidFlixApp extends StatelessWidget {
-  const KidFlixApp({Key? key}) : super(key: key);
+  KidFlixApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +38,9 @@ class KidFlixApp extends StatelessWidget {
           ],
           child: BlocBuilder<LangCubit, Locale>(
             builder: (context, locale) {
+              Widget startW = OnboardingScreen();
               return MaterialApp(
-                home: OnboardingScreen(),
+                home: startW,
                 debugShowCheckedModeBanner: false,
                 localizationsDelegates: const [
                   AppLocale.delegate,

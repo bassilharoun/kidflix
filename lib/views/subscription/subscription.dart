@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_paypal_payment/flutter_paypal_payment.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:kidflix_app/app/app_cubit/app_cubit.dart';
@@ -88,23 +89,93 @@ class SubscriptionScreen extends StatelessWidget {
                     // Gap(15.h),
                     CustomButton(
                       data: cubit.profileResponse.data!.first.package == null
-                          ? '${getLang(context, "subscribe")}'
+                          ? 'pay now'
                           : '${getLang(context, "alreadySubscribed")}',
                       onPressed: cubit.profileResponse.data!.first.package ==
                               null
                           ? () async {
                               if (cubit.selectedPackage != -1) {
                                 await showAddPasswordDialog(context, () async {
-                                  cubit.subscribe(
-                                      cubit.packageResponse!
-                                          .data[cubit.selectedPackage].id,
-                                      cubit
-                                          .packageResponse!
-                                          .data[cubit.selectedPackage]
-                                          .plans[0]
-                                          .id,
-                                      context,
-                                      cubit.accessCode);
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        PaypalCheckoutView(
+                                      sandboxMode: true,
+                                      clientId:
+                                          "AXpWwEJQzzi6V9U7vXhxpFzL6I0wbngqnrYl47dLMtSk5VZD4kd_yJoV4OjNcPhDxs4lVUWlxwi_p4TW",
+                                      secretKey:
+                                          "EGm-w_vdM8He6U-N852KGaUdDGuj7cJw16zFlNSnWFBCQMbk7aKfx3Pg4ic5ztTIYQQMpPoAS_MfZlkm",
+                                      transactions: [
+                                        {
+                                          "amount": {
+                                            "total": cubit
+                                                .packageResponse!
+                                                .data[cubit.selectedPackage]
+                                                .plans[0]
+                                                .price
+                                                .toStringAsFixed(2),
+                                            "currency": "USD",
+                                            "details": {
+                                              "subtotal": cubit
+                                                  .packageResponse!
+                                                  .data[cubit.selectedPackage]
+                                                  .plans[0]
+                                                  .price
+                                                  .toStringAsFixed(2),
+                                              "shipping": '0',
+                                              "shipping_discount": 0
+                                            }
+                                          },
+                                          "description":
+                                              "The payment transaction description.",
+                                          // "payment_options": {
+                                          //   "allowed_payment_method":
+                                          //       "INSTANT_FUNDING_SOURCE"
+                                          // },
+                                          "item_list": {
+                                            "items": [
+                                              {
+                                                "name": cubit
+                                                    .packageResponse!
+                                                    .data[cubit.selectedPackage]
+                                                    .name,
+                                                "quantity": 1,
+                                                "price": cubit
+                                                    .packageResponse!
+                                                    .data[cubit.selectedPackage]
+                                                    .plans[0]
+                                                    .price
+                                                    .toStringAsFixed(2),
+                                                "currency": "USD"
+                                              },
+                                            ],
+                                          }
+                                        }
+                                      ],
+                                      note:
+                                          "Contact us for any questions on your order.",
+                                      onSuccess: (Map params) async {
+                                        debugPrint("onSuccess: $params");
+                                        cubit.subscribe(
+                                            cubit.packageResponse!
+                                                .data[cubit.selectedPackage].id,
+                                            cubit
+                                                .packageResponse!
+                                                .data[cubit.selectedPackage]
+                                                .plans[0]
+                                                .id,
+                                            context,
+                                            cubit.accessCode,
+                                            "demoTransactionId");
+                                      },
+                                      onError: (error) {
+                                        debugPrint("onError: $error");
+                                        Navigator.pop(context);
+                                      },
+                                      onCancel: () {
+                                        debugPrint('cancelled:');
+                                      },
+                                    ),
+                                  ));
                                 });
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
