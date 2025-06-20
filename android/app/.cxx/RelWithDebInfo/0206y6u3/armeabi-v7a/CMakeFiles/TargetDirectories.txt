@@ -1,0 +1,2 @@
+D:/freelance/kidflix/android/app/.cxx/RelWithDebInfo/0206y6u3/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/freelance/kidflix/android/app/.cxx/RelWithDebInfo/0206y6u3/armeabi-v7a/CMakeFiles/rebuild_cache.dir

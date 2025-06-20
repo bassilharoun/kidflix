@@ -93,7 +93,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                cubit.profileResponse.data!.first.package == null
+                (cubit.profileResponse.data!.isEmpty||cubit.profileResponse.data!.first.package == null)
                     ? SliverToBoxAdapter(
                         child: Padding(
                         padding: EdgeInsets.only(top: 100.h),

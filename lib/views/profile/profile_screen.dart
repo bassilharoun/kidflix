@@ -27,9 +27,19 @@ class _AnimatedProfileState extends State<AnimatedProfile> {
   @override
   Widget build(BuildContext context) {
     AppCubit cubit = AppCubit.get(context);
-    final imgPath = cubit.profileResponse.data![0].userProfile?.image;
-    final userName = cubit.profileResponse.data![0].kidName;
-    late int _index = 0;
+String? imgPath = "https://img.freepik.com/premium-vector/cute-boy-smiling-cartoon-kawaii-boy-illustration-boy-avatar-happy-kid_1001605-3453.jpg";
+        String userName = "";
+        String pFirstName = "";
+        String email = "";
+        String? cover = "https://img.freepik.com/free-photo/3d-cartoon-background-children_23-2150473128.jpg";
+
+    if (cubit.profileResponse.data!.isNotEmpty){
+      imgPath = cubit.profileResponse.data![0].userProfile?.image;
+      userName = cubit.profileResponse.data![0].kidName;
+      cover = cubit.profileResponse.data!.first.userProfile?.cover;
+      pFirstName = cubit.profileResponse.data!.first.pFirstName;
+      email = cubit.profileResponse.data!.first.email;
+    }    late int _index = 0;
 
     return BlocConsumer<AppCubit, AppState>(
       listener: (context, state) {},
@@ -39,7 +49,7 @@ class _AnimatedProfileState extends State<AnimatedProfile> {
           // Background Image Layer
           CachedNetworkImage(
             imageUrl:
-                cubit.profileResponse.data!.first.userProfile?.cover ?? "",
+                cover!,
             fit: BoxFit.cover,
             width: double.infinity,
             height: double.infinity,
@@ -102,8 +112,7 @@ class _AnimatedProfileState extends State<AnimatedProfile> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(100.sp),
                         child: CachedNetworkImage(
-                          imageUrl: imgPath ??
-                              "https://img.freepik.com/premium-vector/cute-boy-smiling-cartoon-kawaii-boy-illustration-boy-avatar-happy-kid_1001605-3453.jpg",
+                          imageUrl: imgPath! ,
                           fit: BoxFit.cover,
                           errorWidget: (context, url, error) => Image.asset(
                             'assets/images/profile_placeholder.png', // Local placeholder image path
@@ -120,7 +129,7 @@ class _AnimatedProfileState extends State<AnimatedProfile> {
                   top: MediaQuery.of(context).size.height * 0.22,
                   left: 20,
                   child: Text(
-                    cubit.profileResponse.data!.first.kidName,
+                    userName,
                     softWrap: false,
                     style: TextStyle(
                       color: Colors.white,
@@ -137,7 +146,7 @@ class _AnimatedProfileState extends State<AnimatedProfile> {
                     child: Material(
                       color: Colors.transparent,
                       child: Text(
-                        cubit.profileResponse.data!.first.pFirstName,
+                        pFirstName,
                         softWrap: false,
                         style: TextStyle(
                           color: Colors.white,
@@ -156,7 +165,7 @@ class _AnimatedProfileState extends State<AnimatedProfile> {
                     child: Material(
                       color: Colors.transparent,
                       child: Text(
-                        cubit.profileResponse.data!.first.email,
+                        email,
                         softWrap: false,
                         style: TextStyle(
                           color: Colors.white,

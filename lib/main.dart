@@ -7,7 +7,6 @@ import 'package:kidflix_app/app/app_cubit/lang_cubit.dart';
 import 'package:kidflix_app/app/app_cubit/time_check_cubit.dart';
 import 'package:kidflix_app/app/helpers/app_locale.dart';
 import 'package:kidflix_app/app/helpers/cache_helper.dart';
-import 'package:kidflix_app/views/nav_bar/nav_bar.dart';
 import 'package:kidflix_app/views/onboarding/onboarding_screen.dart';
 
 void main() async {

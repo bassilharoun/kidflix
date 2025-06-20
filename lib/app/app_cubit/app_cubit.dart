@@ -228,7 +228,9 @@ class AppCubit extends Cubit<AppState> {
       debugPrint("profile response ${json.encode(response.data)}");
 
       if (response.statusCode == 200) {
+        debugPrint("okay the response is getting done and the res code is 200");
         profileResponse = ProfileResponse.fromJson(response.data);
+        debugPrint("sample is ::: ${profileResponse.data}, ${profileResponse.message}, ${profileResponse.data!.first.kidName}");
         if (profileResponse.data!.first.gender == 0) {
           AppColors.purble = Color.fromARGB(255, 24, 142, 205);
         } else {

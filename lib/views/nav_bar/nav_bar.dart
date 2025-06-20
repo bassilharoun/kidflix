@@ -68,8 +68,10 @@ class HomeState extends State<Home>
   void _checkUserAccess() {
     // Simulate receiving active times from an API or local source
     // Start checking the access times in the cubit
+    if(AppCubit.get(context).profileResponse.data!.isNotEmpty){
     BlocProvider.of<TimeCheckCubit>(context).startChecking(
         AppCubit.get(context).profileResponse.data!.first.userTimeActive);
+    }
   }
 
   Widget getBottomNavigationBar() {
@@ -241,12 +243,16 @@ class HomeState extends State<Home>
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(100.sp),
                             child: CachedNetworkImage(
-                              imageUrl: AppCubit.get(context)
+                              imageUrl: 
+                               (AppCubit.get(context)
                                       .profileResponse
-                                      .data
-                                      ?.first
-                                      .userProfile
-                                      ?.image ??
+                                      .data!
+                                      .isNotEmpty 
+                                       ) ? 
+                                       AppCubit.get(context)
+                                      .profileResponse
+                                      .data!.first.userProfile!.image
+                                        :
                                   "https://img.freepik.com/premium-vector/cute-boy-smiling-cartoon-kawaii-boy-illustration-boy-avatar-happy-kid_1001605-3453.jpg",
                               fit: BoxFit.cover,
                               errorWidget: (context, url, error) => Image.asset(

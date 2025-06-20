@@ -24,8 +24,13 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     AppCubit cubit = AppCubit.get(context);
-    final imgPath = cubit.profileResponse.data![0].userProfile?.image;
-    final userName = cubit.profileResponse.data![0].kidName;
+    String? imgPath = "https://img.freepik.com/premium-vector/cute-boy-smiling-cartoon-kawaii-boy-illustration-boy-avatar-happy-kid_1001605-3453.jpg";
+        String userName = "";
+
+    if (cubit.profileResponse.data!.isNotEmpty){
+      imgPath = cubit.profileResponse.data![0].userProfile?.image;
+      userName = cubit.profileResponse.data![0].kidName;
+    }
 
     return BlocConsumer<AppCubit, AppState>(
       listener: (context, state) {},
@@ -47,7 +52,7 @@ class SettingsScreen extends StatelessWidget {
                 // User card with profile picture and edit option
                 UserCard(
                   userName: userName,
-                  userProfilePic: imgPath ?? "",
+                  userProfilePic: imgPath!,
                   cardActionWidget: SettingsItem(
                     icons: Icons.edit,
                     iconColor: Colors.yellow,

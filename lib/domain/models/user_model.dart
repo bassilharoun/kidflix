@@ -157,8 +157,8 @@ class UserTimeActive {
   int userId;
   String start;
   String end;
-  String createdAt;
-  String updatedAt;
+  String? createdAt;
+  String? updatedAt;
 
   UserTimeActive({
     required this.id,

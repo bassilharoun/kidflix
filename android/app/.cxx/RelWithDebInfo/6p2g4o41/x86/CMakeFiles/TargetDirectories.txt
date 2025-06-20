@@ -1,0 +1,2 @@
+D:/freelance/kidflix/android/app/.cxx/RelWithDebInfo/6p2g4o41/x86/CMakeFiles/edit_cache.dir
+D:/freelance/kidflix/android/app/.cxx/RelWithDebInfo/6p2g4o41/x86/CMakeFiles/rebuild_cache.dir
